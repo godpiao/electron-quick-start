@@ -1,7 +1,7 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow, Menu, Tray } = require('electron')
-const path = require('node:path')
-let mainWindow;
+import { app, BrowserWindow, Menu, Tray } from 'electron';
+import path from 'node:path';
+let mainWindow: BrowserWindow | null;
 function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -11,9 +11,13 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   })
-
+  try {
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  mainWindow.loadFile('dist/index.html')
+  } catch (e) {
+    console.log("err is ", e)
+  }
+
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -24,8 +28,9 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
 
+
   // 创建系统托盘图标
-  tray = new Tray(path.join(__dirname, 'icon.png'));
+  let tray = new Tray(path.join(__dirname, 'icon.png'));
   // 创建上下文菜单
   const contextMenu = Menu.buildFromTemplate([
     {

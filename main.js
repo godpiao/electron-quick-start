@@ -1,10 +1,10 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, Menu, Tray } = require('electron')
 const path = require('node:path')
-
-function createWindow () {
+let mainWindow;
+function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -24,23 +24,35 @@ function createWindow () {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
 
-    // 创建系统托盘图标
-    tray = new Tray(path.join(__dirname, 'icon.png'));
+  // 创建系统托盘图标
+  tray = new Tray(path.join(__dirname, 'icon.png'));
   // 创建上下文菜单
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'open', type: 'normal', click: () => { 
-      app.dock.show()
-      app.show()
-      console.log("show")
-      //createWindow()
-      } 
+    {
+      label: 'open', type: 'normal', click: () => {
+        app.dock.show()
+        app.show()
+        if (mainWindow) {
+          mainWindow.show()
+        }
+        else {
+          console.log("create window again")
+          createWindow()
+        }
+        console.log("show")
+        //createWindow()
+      }
     },
-    { label: 'hide', type: 'normal', click: () => { 
-      app.dock.hide()
-      app.hide()
-      console.log("hide")
-      //createWindow()
-      } 
+    {
+      label: 'hide', type: 'normal', click: () => {
+        app.dock.hide()
+        app.hide()
+        if (mainWindow) {
+          mainWindow.hide()
+        }
+        console.log("hide")
+        //createWindow()
+      }
     },
     { label: 'Item 2', type: 'normal', click: () => console.log('Item 2 clicked') },
     { label: 'Quit', type: 'normal', click: () => app.quit() }
@@ -68,6 +80,10 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
+  else {
+    mainWindow = null
+    console.log("create window again")
+  }
 })
 
 // In this file you can include the rest of your app's specific main process

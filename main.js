@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, Menu, Tray } = require('electron')
 const path = require('node:path')
 
 function createWindow () {
@@ -23,6 +23,37 @@ function createWindow () {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+
+    // 创建系统托盘图标
+    tray = new Tray(path.join(__dirname, 'icon.png'));
+  // 创建上下文菜单
+  const contextMenu = Menu.buildFromTemplate([
+    { label: 'open', type: 'normal', click: () => { 
+      app.dock.show()
+      app.show()
+      console.log("show")
+      //createWindow()
+      } 
+    },
+    { label: 'hide', type: 'normal', click: () => { 
+      app.dock.hide()
+      app.hide()
+      console.log("hide")
+      //createWindow()
+      } 
+    },
+    { label: 'Item 2', type: 'normal', click: () => console.log('Item 2 clicked') },
+    { label: 'Quit', type: 'normal', click: () => app.quit() }
+  ]);
+
+  // 设置托盘图标的上下文菜单
+  tray.setToolTip('My Electron App');
+  tray.setContextMenu(contextMenu);
+
+
+  console.log('app ready')
+
+
   createWindow()
 
   app.on('activate', function () {
